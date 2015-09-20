@@ -9,4 +9,4 @@ int value(char a);
 char reValue(int n);
 ll fastMod(ll base, ll exponent, unsigned long modulus);
 char* readString(char *readIn);
-ll* handleString(char *readIn, ll exponent, unsigned long modulus);
+void handleString(FILE *fp, char *readIn, ll exponent, unsigned long modulus);

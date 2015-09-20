@@ -98,6 +98,7 @@ ll fastMod(ll base, ll exponent, unsigned long modulus) {
 
 char* readString(char *readIn) {
     char *handle = (char*)malloc(strlen(readIn) * sizeof(char));
+    memset(handle, 0, sizeof(strlen(readIn) * sizeof(char)));
     int i,j;
     for (i = 0, j = 0; i < strlen(readIn); ++i) {
         if ( (i + 1) % 8 != 0) {
@@ -108,12 +109,15 @@ char* readString(char *readIn) {
     return handle;
 }
 
-ll* handleString(char *readIn, ll exponent, unsigned long modulus) {
-    int length = strlen(readIn)/6;
+void handleString(FILE *fp, char *readIn,ll exponent, unsigned long modulus) {
+    int length = strlen(readIn) / 6;
     ll *res = malloc(length * sizeof(ll));
     memset(res, 0, length * sizeof(ll));
 
-    for (int i = 0; i < strlen(readIn) / 6; ++i) {
+    // char *output = malloc( (length + 5) * 6 * sizeof(char));
+    // memset(output, 0, (length + 5) * 6 * sizeof(char));
+
+    for (int i = 0 ; i < length ; ++i) {
         for (int j = 0 ; j < 6; ++j) {
             res[i] = res[i] * 41 + value(readIn[i * 6 + j]);
         }
@@ -124,9 +128,13 @@ ll* handleString(char *readIn, ll exponent, unsigned long modulus) {
 
     for (int i = 0; i < length; ++i) {
         ll temp = res[i];
-        int tempLength = log(modulus) / log(41);
-        int arr[tempLength];
+        int tempLength = log(modulus) / log(41) + 10;
+        int arr[6];
+        char tempRes[6];
+        memset(arr,0, sizeof(arr));
+        memset(tempRes, 0, sizeof(tempRes));
 
+        //extract number
         int i = 0, j = 0;
         while (temp > 0) {
             arr[i++] = temp % 41;
@@ -135,17 +143,12 @@ ll* handleString(char *readIn, ll exponent, unsigned long modulus) {
 
         int __i = i;
 
-        i--;
-        while (i > j) {
-            int _temp = arr[j];
-            arr[j] = arr[i];
-            arr[i] = _temp;
-            i--; j++;
-        }
-
-        for (int ii = 0; ii < __i; ++ii) {
-            printf("%c", reValue(arr[ii]));
+        for (int ii = 0; ii < 6; ++ii) {
+            fprintf(fp, "%c", reValue(arr[5 - ii]));
         }
     }
-    return res;
+    fprintf(fp,"\n");
+    //printf("%s\n",output);
+
+    free(res);
 }
