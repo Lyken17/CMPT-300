@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO
+CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO -std=c11
 LIBS = -lm
 TARGET = lyrebird
 OBJECTS = main.o memwatch.o awesome.o
