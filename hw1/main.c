@@ -15,6 +15,11 @@ int main(int argc, const char * argv[]) {
 
     FILE *fin = fopen(argv[1],"r");
     FILE *fout = fopen(argv[2],"w");
+    if (fin == NULL) {
+        printf("shit\n");
+        exit(-1);
+    }
+
     size_t len = 0;
     ssize_t read;
     char *line = NULL;
