@@ -14,8 +14,10 @@ int main(int argc, const char * argv[]) {
     int status=0;
     int i = 0;
     int pid = 0;
-
+    char curTime[30];
     FILE *fp  =fopen(argv[1],"r");
+    if (fp == NULL)
+        exit(-1);
     size_t len = 0;
     ssize_t read;
     char *line = NULL;
@@ -30,9 +32,8 @@ int main(int argc, const char * argv[]) {
         pid = fork();
         if (pid == 0 || pid == -1) break;
         //main process
-        char a[30];
-        getCurrentTime(a);
-        printf("[%s] Child process ID #%d created to decrypt %s.\n", a, pid, inputFile);
+        getCurrentTime(curTime);
+        printf("[%s] Child process ID #%d created to decrypt %s.\n", curTime, pid, inputFile);
         // printf("tims is %s\n", a);
         // printf("input is [%s]\n", inputFile);
         // printf("output is [%s]\n", outputFile);
@@ -45,22 +46,17 @@ int main(int argc, const char * argv[]) {
     }
     else if (pid == 0) //child process
     {
-        int status = oldmain(inputFile, outputFile);
-        exit(i);
+        int status = lyrebird(inputFile, outputFile);
+        getCurrentTime(curTime);
+        printf("[%s] Decryption of %s complete. Process ID #%d Exiting.\n", curTime, inputFile, getpid());
+        exit(0);
     }
     else //parent process
     {
         while((child = wait(&status)) > 0) {
-            //printf("Exit = %d, child ID = %d\n", status/256, child);
-            if (status/256 == 0) {
-                char a[30];
-                getCurrentTime(a);
-                printf("[%s] Child process ID #%d did not terminate successfully.\n", a, child);
-            }
-            else {
-                char a[30];
-                getCurrentTime(a);
-                printf("[%s] Decryption of %s complete. Process ID #%d Exiting.\n", a, fileRecord[status/256], child);
+            if (status/256 != 0) {
+                getCurrentTime(curTime);
+                printf("[%s] Child process ID #%d did not terminate successfully.\n", curTime, child);
             }
         }
     }
@@ -69,14 +65,14 @@ int main(int argc, const char * argv[]) {
 
 
 
-int oldmain(char *inputFile, char *outputFile) {
+int lyrebird(char *inputFile, char *outputFile) {
     ll exponent = 1921821779;
     long modulus = 4294434817;
     FILE *fin = fopen(inputFile,"r");
     FILE *fout =
      fopen(outputFile,"w");
     if (fin == NULL) {
-        exit(0);
+        exit(-1);
     }
 
     size_t len = 0;
