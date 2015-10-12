@@ -14,21 +14,20 @@ int main(int argc, const char * argv[]) {
     int status=0;
     int i = 0;
     int pid = 0;
-    char curTime[30];
-    FILE *fp  =fopen(argv[1],"r");
+
+    FILE *fp = fopen(argv[1],"r");
     if (fp == NULL)
         exit(-1);
     size_t len = 0;
     ssize_t read;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
-    char fileRecord[20][1024];
+    char curTime[30];
 
     while ((read = getline(&line, &len, fp)) != -1) {
         //printf("%s", line);
         sscanf(line,"%s%s",inputFile,outputFile);
         i++;
-        strcpy(fileRecord[i],inputFile);
         pid = fork();
         if (pid == 0 || pid == -1) break;
         //main process
@@ -69,8 +68,8 @@ int lyrebird(char *inputFile, char *outputFile) {
     ll exponent = 1921821779;
     long modulus = 4294434817;
     FILE *fin = fopen(inputFile,"r");
-    FILE *fout =
-     fopen(outputFile,"w");
+    FILE *fout = fopen(outputFile,"w");
+
     if (fin == NULL) {
         exit(-1);
     }
