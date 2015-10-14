@@ -22,7 +22,7 @@ int main(int argc, const char * argv[]) {
         exit(-1);
     }
     size_t len = 0;
-    ssize_t read;
+    size_t read;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
 
