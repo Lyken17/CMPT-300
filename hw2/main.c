@@ -6,7 +6,6 @@
 //  Copyright (c) 2015 Lyken Syu. All rights reserved.
 
 
-
 #include "awesome.h"
 
 int main(int argc, const char * argv[]) {
@@ -14,15 +13,19 @@ int main(int argc, const char * argv[]) {
     int status=0;
     int i = 0;
     int pid = 0;
+    char curTime[30];
 
     FILE *fp = fopen(argv[1],"r");
-    if (fp == NULL)
+    if (fp == NULL) {
+        getCurrentTime(curTime);
+        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
         exit(-1);
+    }
     size_t len = 0;
     ssize_t read;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
-    char curTime[30];
+
 
     while ((read = getline(&line, &len, fp)) != -1) {
         //printf("%s", line);
@@ -41,7 +44,9 @@ int main(int argc, const char * argv[]) {
 
     if (pid == -1)
     {
-        printf("alloc new process error!\n");
+        getCurrentTime(curTime);
+        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
+        exit(-1);
     }
     else if (pid == 0) //child process
     {
@@ -75,7 +80,7 @@ int lyrebird(char *inputFile, char *outputFile) {
     }
 
     size_t len = 0;
-    ssize_t read;
+    size_t read;
     char *line = NULL;
 
     while ((read = getline(&line, &len, fin)) != -1) {

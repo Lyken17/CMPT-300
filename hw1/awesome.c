@@ -97,7 +97,7 @@ ll fastMod(ll base, ll exponent, unsigned long modulus) {
 }
 
 char* readString(char *readIn) {
-    char *handle = (char*)malloc(strlen(readIn) * sizeof(char));
+    char *handle = (char*)malloc((strlen(readIn) * sizeof(char) + 5) * 2);
     memset(handle, 0, sizeof(strlen(readIn) * sizeof(char)));
     int i,j;
     for (i = 0, j = 0; i < strlen(readIn); ++i) {
@@ -111,11 +111,8 @@ char* readString(char *readIn) {
 
 void handleString(FILE *fp, char *readIn,ll exponent, unsigned long modulus) {
     int length = strlen(readIn) / 6;
-    ll *res = malloc(length * sizeof(ll));
+    ll *res = malloc((length * sizeof(ll) + 5) * 2);
     memset(res, 0, length * sizeof(ll));
-
-    // char *output = malloc( (length + 5) * 6 * sizeof(char));
-    // memset(output, 0, (length + 5) * 6 * sizeof(char));
 
     for (int i = 0 ; i < length ; ++i) {
         for (int j = 0 ; j < 6; ++j) {
@@ -129,7 +126,7 @@ void handleString(FILE *fp, char *readIn,ll exponent, unsigned long modulus) {
     for (int i = 0; i < length; ++i) {
         ll temp = res[i];
         int tempLength = log(modulus) / log(41) + 10;
-        int arr[6];
+            int arr[6];
         char tempRes[6];
         memset(arr,0, sizeof(arr));
         memset(tempRes, 0, sizeof(tempRes));
