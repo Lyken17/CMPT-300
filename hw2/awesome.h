@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <time.h>
 #include "memwatch.h"
 typedef unsigned long long ll;
