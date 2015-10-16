@@ -1,17 +1,21 @@
 Name : Ligeng Zhu
 Student number : 301295766
 SFU user name : lykenz
-Lecture section :
+Lecture section : D1
 TA's name : Scott Kristjanson
 
 Description :
-1. This is the first assignment of SFU-CMPT-300, which decodes useful information from a encrypted string.
+1. This is the second assignment of SFU-CMPT-300, which uses processes to speed up program.
+
 2. How to run it
     make
-    ./lyrebird [input sample] [output file]
+    ./lyrebird [config_file.txt]
+
 3. Each file
     awesome.h : head file
     awesome.c : some functions used in this assignment such as fastMod
     main.c : as its name.
+
 4. Honesty code outlines:
-    In this program, I used "fastMod" (awesome.c line 88) from ZJU ACM-ICPC team, and discussed with Chong Guo, Jingda Chen about some makefile details and how to use memwatch .
+    In this program, I used a Linux fork template from Stackoverflow.
+    All rest parts are done by myself.

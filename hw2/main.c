@@ -28,21 +28,17 @@ int main(int argc, const char * argv[]) {
 
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        //printf("%s", line);
+        //creat child process for each line
         sscanf(line,"%s%s",inputFile,outputFile);
         i++;
         pid = fork();
         if (pid == 0 || pid == -1) break;
-        //main process
+        //parent process prints creating log
         getCurrentTime(curTime);
         printf("[%s] Child process ID #%d created to decrypt %s.\n", curTime, pid, inputFile);
-        // printf("tims is %s\n", a);
-        // printf("input is [%s]\n", inputFile);
-        // printf("output is [%s]\n", outputFile);
-        //oldmain(inputFile, outputFile);
     }
 
-    if (pid == -1)
+    if (pid == -1) //fork fail
     {
         getCurrentTime(curTime);
         printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
@@ -50,7 +46,7 @@ int main(int argc, const char * argv[]) {
     }
     else if (pid == 0) //child process
     {
-        int status = lyrebird(inputFile, outputFile);
+        lyrebird(inputFile, outputFile); //do child task
         getCurrentTime(curTime);
         printf("[%s] Decryption of %s complete. Process ID #%d Exiting.\n", curTime, inputFile, getpid());
         exit(0);
@@ -58,7 +54,7 @@ int main(int argc, const char * argv[]) {
     else //parent process
     {
         while((child = wait(&status)) > 0) {
-            if (status/256 != 0) {
+            if (status/256 != 0) { //abonormal exit
                 getCurrentTime(curTime);
                 printf("[%s] Child process ID #%d did not terminate successfully.\n", curTime, child);
             }
@@ -84,8 +80,9 @@ int lyrebird(char *inputFile, char *outputFile) {
     char *line = NULL;
 
     while ((read = getline(&line, &len, fin)) != -1) {
-        char *handle = readString(line);
-        handleString(fout, handle,exponent,modulus);
+        //read line
+        char *handle = readString(line); //pre-process
+        handleString(fout, handle,exponent,modulus); //Decryption
         free(handle);
     }
 

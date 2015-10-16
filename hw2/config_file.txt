@@ -1,2 +1,8 @@
 ./test/a1.in ./test/a1.out
 ./test/a2.in ./test/a2.out
+./test/a2.txt ./test/a2_out.txt
+./test/t2-et-Assignment-Example.txt ./test/a3_out.txt
+./test/t5-et-Single-Tweet-1-char.txt ./test/a4_out.txt
+./test/t7-et-Single-Tweet-139-chars.txt ./test/a5_out.txt
+./test/t8-et-Single-Tweet-140-chars.txt ./test/a6_out.txt
+./test/t9-et-File-with-10-tweets.txt ./test/a7_out.txt

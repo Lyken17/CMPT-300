@@ -1,0 +1,10 @@
+this file contains ten tweets, including this one!    
+this is the second tweet      
+the third tweet contains every permitted character:  abcdefghijklmnopqrstuvwxyz#.,'!?()-: 
+the fourth is one-hundred-and-forty characters long: abcdefghijklmnopqrstuvwxyz#.,'!?()-:    abcdefghijklmnopqrstuvwxyz#.,'!?()-:    abcdefg    
+this is the fifth and the six has zero characters!    
+      
+this is the seventh and the eigth contains the first (space) and last character (:)  many times!      
+            ::::::::        ::::::::::::::::::::::::::::::::     ::::::::::::::::::   ----------      
+this is the ninth line and it is quite long! but the tenth is very short      
+very short  
