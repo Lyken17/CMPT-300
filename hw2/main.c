@@ -28,17 +28,21 @@ int main(int argc, const char * argv[]) {
 
 
     while ((read = getline(&line, &len, fp)) != -1) {
-        //creat child process for each line
+        //printf("%s", line);
         sscanf(line,"%s%s",inputFile,outputFile);
         i++;
         pid = fork();
         if (pid == 0 || pid == -1) break;
-        //parent process prints creating log
+        //main process
         getCurrentTime(curTime);
         printf("[%s] Child process ID #%d created to decrypt %s.\n", curTime, pid, inputFile);
+        // printf("tims is %s\n", a);
+        // printf("input is [%s]\n", inputFile);
+        // printf("output is [%s]\n", outputFile);
+        //oldmain(inputFile, outputFile);
     }
 
-    if (pid == -1) //fork fail
+    if (pid == -1)
     {
         getCurrentTime(curTime);
         printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
@@ -46,7 +50,7 @@ int main(int argc, const char * argv[]) {
     }
     else if (pid == 0) //child process
     {
-        lyrebird(inputFile, outputFile); //do child task
+        int status = lyrebird(inputFile, outputFile);
         getCurrentTime(curTime);
         printf("[%s] Decryption of %s complete. Process ID #%d Exiting.\n", curTime, inputFile, getpid());
         exit(0);
@@ -54,7 +58,7 @@ int main(int argc, const char * argv[]) {
     else //parent process
     {
         while((child = wait(&status)) > 0) {
-            if (status/256 != 0) { //abonormal exit
+            if (status/256 != 0) {
                 getCurrentTime(curTime);
                 printf("[%s] Child process ID #%d did not terminate successfully.\n", curTime, child);
             }
@@ -80,9 +84,8 @@ int lyrebird(char *inputFile, char *outputFile) {
     char *line = NULL;
 
     while ((read = getline(&line, &len, fin)) != -1) {
-        //read line
-        char *handle = readString(line); //pre-process
-        handleString(fout, handle,exponent,modulus); //Decryption
+        char *handle = readString(line);
+        handleString(fout, handle,exponent,modulus);
         free(handle);
     }
 
