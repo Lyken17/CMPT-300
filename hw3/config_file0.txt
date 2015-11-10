@@ -1,0 +1,4 @@
+FCFS
+./test/a1.in ./test/a1.out
+./test/a2.in ./test/a2.out
+./test/a2.txt ./test/a2_out.txt

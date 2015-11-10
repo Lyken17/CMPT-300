@@ -7,6 +7,7 @@
 
 
 #include "awesome.h"
+#include "mypipe.h"
 
 int main(int argc, const char * argv[]) {
     pid_t child, parent;
@@ -21,12 +22,33 @@ int main(int argc, const char * argv[]) {
         printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
         exit(-1);
     }
+    
     size_t len = 0;
     size_t read;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
 
+    //Read the scheduling option
+    read = getline(&line, &len, fp);
+    printf("%s", line);
+    int plan = 0;
+    if (strcmp(line, "round robin\n") == 0)
+    {
+        plan = 1;
+        printf("This is round robin scheduling\n");
+    }
+    else if (strcmp(line, "fcfs\n") == 0)
+    {
+        plan = 2;
+        printf("This is FCFS scheduling\n");
+    }
+    else
+    {
+        printf("Not legal option!\n");
+        exit(EXIT_FAILURE);
+    }
 
+    //Handling the problem
     while ((read = getline(&line, &len, fp)) != -1) {
         //printf("%s", line);
         sscanf(line,"%s%s",inputFile,outputFile);
