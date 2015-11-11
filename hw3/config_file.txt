@@ -5,3 +5,4 @@ fcfs
 ./test/a4.in ./test/a4.out
 ./test/a5.in ./test/a5.out
 ./test/a6.in ./test/a6.out
+./test/a7.in ./test/a7.out
