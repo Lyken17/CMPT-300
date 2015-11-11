@@ -1,4 +1,7 @@
 fcfs
 ./test/a1.in ./test/a1.out
 ./test/a2.in ./test/a2.out
-./test/a2.txt ./test/a2_out.txt
+./test/a3.in ./test/a3.out
+./test/a4.in ./test/a4.out
+./test/a5.in ./test/a5.out
+./test/a6.in ./test/a6.out

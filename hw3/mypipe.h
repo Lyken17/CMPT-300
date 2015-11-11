@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEBUG_MODE 1
+#define DEBUG_MODE 0
 
 struct powerful
 {
@@ -16,11 +16,11 @@ struct powerful
 
 typedef struct powerful powerful;
 
-int getTask(powerful line, char file[1024]);
+int getTask(powerful line, char file[2048]);
 
 int workDone(powerful line);
 
-int deliverTask(powerful line, char file[1024]);
+int deliverTask(powerful line, char file[2048]);
 
 int checkEachChild(powerful line);
 

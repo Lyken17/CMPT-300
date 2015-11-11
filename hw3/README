@@ -5,7 +5,7 @@ Lecture section : D1
 TA's name : Scott Kristjanson
 
 Description :
-1. This is the second assignment of SFU-CMPT-300, which uses processes to speed up program.
+1. This is the third assignment of SFU-CMPT-300, which uses processes to speed up program.
 
 2. How to run it
     make
@@ -14,7 +14,9 @@ Description :
 3. Each file
     awesome.h : head file
     awesome.c : some functions used in this assignment such as fastMod
-    main.c : as its name.
+    mypipe.h : head file about pipelines
+	mypipe.h : functions relavant to pipelines.
+	main.c : as its name.
 
 4. Honesty code outlines:
     In this program, I used a Linux fork template from Stackoverflow.

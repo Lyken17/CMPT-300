@@ -8,18 +8,16 @@ const char filled[] = "\0";
 int data_processed = 0;
 char buffer[BUFSIZ + 1];
 
-int getTask(powerful line, char file[1024])
+int getTask(powerful line, char file[2048])
 {
-
 	data_processed = read(line.toChild[0], buffer, BUFSIZ);
-	if (DEBUG_MODE)
-		printf("PID:%d Read %d bytes: %s\n",getpid(), data_processed, buffer);
+	DEBUG_MODE ? printf("PID:%d Read %d bytes: %s\n",getpid(), data_processed, buffer) : 0;
 	strcpy(file, buffer);
-	
+
 	char *pos = strstr(buffer, owari);
 	if (pos)
 		return -1;
-	
+
 	return 0;
 }
 
@@ -30,18 +28,17 @@ int workDone(powerful line)
 	return 0;
 }
 
-int deliverTask(powerful line, char file[1024])
+int deliverTask(powerful line, char file[2048])
 {
 	data_processed = write(line.toChild[1], file, strlen(file));
-	
-	if (DEBUG_MODE)
-		printf("PID:%d Wrote %d bytes: %s\n",getpid(), data_processed, file);
+
+	DEBUG_MODE ? printf("PID:%d Wrote %d bytes: %s\n",getpid(), data_processed, file) : 0;
 }
 
 int checkEachChild(powerful line)
 {
 	int retval;
-	
+
 	fd_set set;
 	struct timeval timeout;
 	timeout.tv_sec = 0;
@@ -56,7 +53,7 @@ int checkEachChild(powerful line)
     else if (retval)
     {
     	//Data is avaliable
-    	
+
         return 0;
     }
     else
@@ -90,5 +87,5 @@ int checkFreeChild(powerful ppline[], int total)
   	}
   	//printf("No data within one round.\n");
   	return -1;
-    
+
 }

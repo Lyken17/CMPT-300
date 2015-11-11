@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO -std=c11
 LIBS = -lm
 TARGET = lyrebird
-OBJECTS = main.o memwatch.o awesome.o mypipe.o
+OBJECTS = main.o awesome.o mypipe.o memwatch.o
 
 all: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(TARGET) $^ $(LIBS)
