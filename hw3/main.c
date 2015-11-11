@@ -50,7 +50,7 @@ int main(int argc, const char * argv[]) {
 
     //Some variables will be used later
     int total = sysconf(_SC_NPROCESSORS_ONLN) - 1;//Cores of computer
-    total = 3;
+    //total = 3;
 	powerful ppline[total];
 
     int data_processed = 0;
@@ -81,16 +81,15 @@ int main(int argc, const char * argv[]) {
 		fprintf(stderr, "Fork failure");
 		exit(EXIT_FAILURE);
 	}
-    else if(pid == 0)
+    else if(pid == 0) //Child process
 	{
-        //Child process
+
 		int job;
-		 1 ? printf("pid = %d, i = %d\n",getpid(), i) : 0;
+        DEBUG_MODE ? printf("pid = %d, i = %d\n",getpid(), i) : 0;
 
 		workDone(ppline[i]);
 		while(1)
 		{
-
 			job = getTask(ppline[i], file);
 			if (job == -1)
 			{
@@ -116,45 +115,47 @@ int main(int argc, const char * argv[]) {
 
 		exit(EXIT_SUCCESS);
 	}
-    else
+    else //Parent process
 	{
-		int freeChild = -1;
-        while ((read = getline(&line, &len, fp)) != -1) {
-            //printf("%s", line);
-            while((freeChild = checkFreeChild(ppline, total)) == -1);
+        if (plan == 2) //FCFS scheduling
+        {
+    		int freeChild = -1;
+            //Read line from file until EOF
+            while ((read = getline(&line, &len, fp)) != -1) {
+                //printf("%s", line);
+                while((freeChild = checkFreeChild(ppline, total)) == -1);
 
-            sscanf(line,"%s%s",inputFile,outputFile);
-            //main process
-            getCurrentTime(curTime);
-            printf("[%s] Child process ID #%d created to decrypt %s.\n", curTime, pid, inputFile);
-            strcpy(file, line);
-            deliverTask(ppline[freeChild], file);
+                sscanf(line,"%s%s",inputFile,outputFile);
+                //main process
+                getCurrentTime(curTime);
+                printf("[%s] Child process ID #%d created to decrypt %s.\n", curTime, pid, inputFile);
+                strcpy(file, line);
+                deliverTask(ppline[freeChild], file);
+            }
+
+    		strcpy(file, owari);
+
+    		int allChild[total];
+    		int n = total;
+    		memset(allChild, 0, sizeof(allChild));
+            //Whenever a child finish its task, send him a END_OF_TASK signal.
+    		while (n > 0)
+    		{
+    			for (int i = 0; i < total; ++i)
+    			{
+    				if (allChild[i] == 1)
+    					continue;
+    				int temp;
+    				temp = checkEachChild(ppline[i]);
+    				if (temp == 0)
+    				{
+    					allChild[i] = 1;
+    					deliverTask(ppline[i], file);
+    					n--;
+    				}
+    			}
+    		}
         }
-
-		strcpy(file, owari);
-
-		int allChild[total];
-		int n = total;
-		memset(allChild, 0, sizeof(allChild));
-		while (n > 0)
-		{
-			for (int i = 0; i < total; ++i)
-			{
-				if (allChild[i] == 1)
-					continue;
-				int temp;
-				temp = checkEachChild(ppline[i]);
-				if (temp == 0)
-				{
-					allChild[i] = 1;
-					deliverTask(ppline[i], file);
-					n--;
-				}
-			}
-		}
-
-		pid_t child;
-		int status;
 
 		exit(EXIT_SUCCESS);
 	}
