@@ -8,6 +8,27 @@ const char filled[] = "\0";
 int data_processed = 0;
 char buffer[BUFSIZ + 1];
 
+int scheduleMethod(char *line)
+{
+	int plan = 0;
+	if (strcmp(line, "round robin\n") == 0)
+    {
+        plan = ROUND_ROBIN;
+        //printf("This is round robin scheduling\n");
+    }
+    else if (strcmp(line, "fcfs\n") == 0)
+    {
+        plan = FCFS;
+        //printf("This is FCFS scheduling\n");
+    }
+    else
+    {
+        //printf("Not legal option!\n");
+        exit(EXIT_FAILURE);
+    }
+	return plan;
+}
+
 int getTask(powerful line, char file[2048])
 {
 	data_processed = read(line.toChild[0], buffer, BUFSIZ);
@@ -33,6 +54,7 @@ int deliverTask(powerful line, char file[2048])
 	data_processed = write(line.toChild[1], file, strlen(file));
 
 	DEBUG_MODE ? printf("PID:%d Wrote %d bytes: %s\n",getpid(), data_processed, file) : 0;
+	return 0;
 }
 
 int checkEachChild(powerful line)
@@ -61,7 +83,7 @@ int checkEachChild(powerful line)
     	//There is no data in pipeline.
     	return -1;
     }
-
+	return -1;
 }
 
 int checkFreeChild(powerful ppline[], int total)
@@ -80,8 +102,8 @@ int checkFreeChild(powerful ppline[], int total)
   		if (available == 0)
   		{
   			read(ppline[i].toParent[0], buffer, BUFSIZ);
-  			printf("-----------Data is available now.  ");
-	        printf("The free child is %d-----------\n", i);
+  			//printf("-----------Data is available now.  ");
+	        //printf("The free child is %d-----------\n", i);
   			return i;
   		}
   	}

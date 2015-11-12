@@ -1,3 +1,0 @@
-fcfs
-./test/a1.in ./test/a1.out
-./test/a2.in ./test/a2.out

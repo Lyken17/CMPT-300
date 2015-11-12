@@ -2,6 +2,27 @@
 
 typedef unsigned long long ll;
 
+int howManyTasks(const char *file)
+{
+    char curTime[30];
+    FILE *fp = fopen(file,"r");
+    if (fp == NULL) {
+        getCurrentTime(curTime);
+        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
+        exit(-1);
+    }
+    char ch;
+    int taskCount = 0;
+    while(!feof(fp))
+    {
+      ch = fgetc(fp);
+      if(ch == '\n')
+        taskCount++;
+    }
+    close(fp);
+    return taskCount - 1;
+}
+
 void getCurrentTime(char a[30]) {
     time_t rawtime;
     struct tm * timeinfo;

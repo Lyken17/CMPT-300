@@ -1,4 +1,4 @@
-fcfs
+round robin
 ./test/a1.in ./test/a1.out
 ./test/a2.in ./test/a2.out
 ./test/a3.in ./test/a3.out
@@ -6,3 +6,11 @@ fcfs
 ./test/a5.in ./test/a5.out
 ./test/a6.in ./test/a6.out
 ./test/a7.in ./test/a7.out
+./test/a8.in ./test/a8.out
+./test/a9.in ./test/a9.out
+./test/a10.in ./test/a10.out
+./test/a11.in ./test/a11.out
+./test/a12.in ./test/a12.out
+./test/a13.in ./test/a13.out
+./test/a14.in ./test/a14.out
+./test/a15.in ./test/a15.out

@@ -7,6 +7,8 @@
 #include <string.h>
 
 #define DEBUG_MODE 0
+#define ROUND_ROBIN 1
+#define FCFS 2
 
 struct powerful
 {
@@ -14,7 +16,15 @@ struct powerful
 	int toParent[2];
 };
 
+struct ffname
+{
+	char name[2048];
+};
+
 typedef struct powerful powerful;
+typedef struct ffname ffname;
+
+int scheduleMethod(char *line);
 
 int getTask(powerful line, char file[2048]);
 
