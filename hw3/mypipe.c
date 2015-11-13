@@ -69,6 +69,7 @@ int checkEachChild(powerful line)
   	FD_ZERO (&set);
 	FD_SET (line.toParent[0], &set);
 
+    //listen to pipeline's status
 	retval = select (FD_SETSIZE, &set, NULL, NULL, &timeout);
 	if (retval == -1)
         perror("select()");
