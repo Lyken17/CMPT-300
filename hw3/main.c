@@ -99,7 +99,7 @@ int main(int argc, const char * argv[]) {
                 printf("[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
             }
 
-            1 ? sleep(rand() % 2 + 1) : 0;
+            DEBUG_MODE ? sleep(rand() % 2 + 1) : 0;
 			workDone(ppline[i]);
 		}
 
@@ -237,11 +237,14 @@ int main(int argc, const char * argv[]) {
 int lyrebird(char *inputFile, char *outputFile) {
     ll exponent = 1921821779;
     long modulus = 4294434817;
+
     FILE *fin = fopen(inputFile,"r");
-    FILE *fout = fopen(outputFile,"w");
     if (fin == NULL) {
         return -1;
     }
+
+    FILE *fout = fopen(outputFile,"w");
+
     size_t len = 0;
     size_t read;
     char *line = NULL;
