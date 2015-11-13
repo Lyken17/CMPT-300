@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/select.h>
 
 #define DEBUG_MODE 0
 #define ROUND_ROBIN 1
