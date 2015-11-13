@@ -82,6 +82,7 @@ int main(int argc, const char * argv[]) {
 			job = getTask(ppline[i], file);
 			if (job == -1)
 			{
+                //received finish signal, exit
                 close(ppline[i].toParent[0]);
                 close(ppline[i].toParent[1]);
                 break;
@@ -112,7 +113,6 @@ int main(int argc, const char * argv[]) {
     		int freeChild = -1;
             //Read line from file until EOF
             while ((read = getline(&line, &len, fp)) != -1) {
-                //printf("%s", line);
                 while((freeChild = checkFreeChild(ppline, total)) == -1);
 
                 sscanf(line,"%s%s",inputFile,outputFile);
@@ -148,10 +148,12 @@ int main(int argc, const char * argv[]) {
 	                    waitpid(pidList[i], &val,WUNTRACED);
                         if (val == 0)
                         {
+                            //normal exit
                             DEBUG_MODE ? printf("PID:%d goes home and is playing dota!\n", pidList[i]) : 0;
                         }
                         else
                         {
+                            //abnormal exit
                             printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, pidList[i]);
                             close(ppline[i].toParent[0]);
                             close(ppline[i].toParent[1]);
@@ -170,6 +172,7 @@ int main(int argc, const char * argv[]) {
     		int freeChild = -1;
             //Read line from file until EOF
             int k = 0;
+            //Make a task table
             while ((read = getline(&line, &len, fp)) != -1)
             {
                 strcpy(taskList[k % total][k / total].name, line);
@@ -189,6 +192,7 @@ int main(int argc, const char * argv[]) {
                 j = currTask[freeChild];
                 if (strcmp(taskList[i][j].name, empty) == 0)
                 {
+                     // all tasks are done
                      strcpy(file, owari);
                      deliverTask(ppline[i], file);
                      close(ppline[i].toChild[0]);
