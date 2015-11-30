@@ -1,0 +1,2 @@
+all:
+	clang client.cpp 
