@@ -14,38 +14,40 @@
 
 #include "ipaddr.h"
 
-struct params {
-        pthread_mutex_t mutex;
-        pthread_cond_t done;
-        int line;
-        FILE *fp;
-};
-
-typedef struct params params_t;
-
+int count = 0;
+FILE *fp = fopen("config_file.txt", "r");
 void *connection_handler(void *socket_desc)
 {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
     char *message , client_message[1024], send_message[1024];
-    
+    printf("conection comes\n");
 
     sprintf(send_message, "This is message from Server\n");
     //Receive a message from client
     while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
     {
-        //wait for lock
-        pthread_cond_wait (&params.done, &params.mutex);
-        //lock these variables
-        pthread_mutex_lock(&(*(params_t*)(arg)).mutex);
-        printf("Message from client %s\n", client_message);
+
+        size_t len = 0;
+        size_t read;
+        char *line = NULL;
+        char inputFile[1024], outputFile[1024];
+        read = getline(&line, &len, fp);
+        if (read == -1)
+        {
+            sprintf(send_message,"GO_HOME_HAVE_FUN");
+            send(sock , send_message , strlen(send_message), MSG_CONFIRM);
+
+            read_size = 0;
+            break;
+        }
+        sscanf(line,"%s%s",inputFile,outputFile);
+
+
+        sprintf(send_message, "%s\n", line);
         //Send the message back to client
         send(sock , send_message , strlen(send_message), MSG_CONFIRM);
-        /* Unlock and signal completion.  */
-        pthread_mutex_unlock(&(*(params_t*)(arg)).mutex);
-        pthread_cond_signal (&(*(params_t*)(arg)).done);
-
     }
 
     if(read_size == 0)
@@ -60,7 +62,6 @@ void *connection_handler(void *socket_desc)
 
     //Free the socket pointer
     //free(socket_desc);
-    printf("conection closed\n");
     return 0;
 }
 

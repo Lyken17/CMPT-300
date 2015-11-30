@@ -52,24 +52,30 @@ int main(int argc, char *argv[])
 
     char *hello = "Call from Lyken";
     char sendMessage[1024];
-    for (size_t i = 0; i < 5; i++) {
+    send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+    while(1){
+
+        memset(recvBuff, 0, sizeof(recvBuff));
+        recv(sockfd, recvBuff, sizeof(recvBuff), 0);
+
         time_t t;
         srand((unsigned) time(&t));
         sprintf(sendMessage, "%s + %d", hello, rand() % 50 );
         send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
 
+        if (strcmp(recvBuff, "GO_HOME_HAVE_FUN") == 0)
+        {
+            puts("LALALA DOTA gogogo");
+            break;
+        }
 
-        memset(recvBuff, 0, sizeof(recvBuff));
-        recv(sockfd, recvBuff, sizeof(recvBuff), 0);
-        printf("%s", recvBuff);
-        sleep(1);
+        char inputFile[1024], outputFile[1024];
+        sscanf(recvBuff, "%s%s",inputFile, outputFile);
+        printf("To handle %s, taget is %s\n", inputFile, outputFile);
+
+        //sleep(1);
     }
 
-
-    if(n < 0)
-    {
-        printf("\n Read error \n");
-    }
     close(sockfd);
 
     return 0;
