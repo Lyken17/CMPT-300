@@ -10,10 +10,15 @@
 #include <arpa/inet.h>
 #include <time.h>
 
+#include "../Share/global.h"
+
+char *Ready = "Ready";
+
+
 int main(int argc, char *argv[])
 {
     int sockfd = 0, n = 0;
-    char recvBuff[1024];
+    char recvBuff[BUFF_SIZE];
     struct sockaddr_in serv_addr;
 
     if(argc != 2)
@@ -31,7 +36,7 @@ int main(int argc, char *argv[])
     memset(&serv_addr, '0', sizeof(serv_addr));
 
     int port = 1234;
-    FILE *fp = fopen("../config.txt","r");
+    FILE *fp = fopen("../Share/config.txt","r");
     fscanf(fp, "%d", &port);
     fclose(fp);
 
@@ -50,11 +55,13 @@ int main(int argc, char *argv[])
        return 1;
     }
 
-    char *hello = "Call from Lyken";
-    char sendMessage[1024];
-    send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
-    while(1){
 
+    char *hello = "Call from Lyken";
+    char sendMessage[BUFF_SIZE];
+    sprintf(sendMessage, "%s", Ready );
+    send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+
+    while(1){
         memset(recvBuff, 0, sizeof(recvBuff));
         recv(sockfd, recvBuff, sizeof(recvBuff), 0);
 
@@ -69,11 +76,11 @@ int main(int argc, char *argv[])
             break;
         }
 
-        char inputFile[1024], outputFile[1024];
+        char inputFile[BUFF_SIZE], outputFile[BUFF_SIZE];
         sscanf(recvBuff, "%s%s",inputFile, outputFile);
         printf("To handle %s, taget is %s\n", inputFile, outputFile);
 
-        //sleep(1);
+        sleep(1);
     }
 
     close(sockfd);

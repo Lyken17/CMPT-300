@@ -1,0 +1,15 @@
+/home/syu/project/CMPT-300/hw4/Client/test/a1.in /home/syu/project/CMPT-300/hw4/Client/test/a1.out
+/home/syu/project/CMPT-300/hw4/Client/test/a2.in /home/syu/project/CMPT-300/hw4/Client/test/a2.out
+/home/syu/project/CMPT-300/hw4/Client/test/a3.in /home/syu/project/CMPT-300/hw4/Client/test/a3.out
+/home/syu/project/CMPT-300/hw4/Client/test/a4.in /home/syu/project/CMPT-300/hw4/Client/test/a4.out
+/home/syu/project/CMPT-300/hw4/Client/test/a5.in /home/syu/project/CMPT-300/hw4/Client/test/a5.out
+/home/syu/project/CMPT-300/hw4/Client/test/a6.in /home/syu/project/CMPT-300/hw4/Client/test/a6.out
+/home/syu/project/CMPT-300/hw4/Client/test/a7.in /home/syu/project/CMPT-300/hw4/Client/test/a7.out
+/home/syu/project/CMPT-300/hw4/Client/test/a8.in /home/syu/project/CMPT-300/hw4/Client/test/a8.out
+/home/syu/project/CMPT-300/hw4/Client/test/a9.in /home/syu/project/CMPT-300/hw4/Client/test/a9.out
+/home/syu/project/CMPT-300/hw4/Client/test/a10.in /home/syu/project/CMPT-300/hw4/Client/test/a10.out
+/home/syu/project/CMPT-300/hw4/Client/test/a11.in /home/syu/project/CMPT-300/hw4/Client/test/a11.out
+/home/syu/project/CMPT-300/hw4/Client/test/a12.in /home/syu/project/CMPT-300/hw4/Client/test/a12.out
+/home/syu/project/CMPT-300/hw4/Client/test/a13.in /home/syu/project/CMPT-300/hw4/Client/test/a13.out
+/home/syu/project/CMPT-300/hw4/Client/test/a14.in /home/syu/project/CMPT-300/hw4/Client/test/a14.out
+/home/syu/project/CMPT-300/hw4/Client/test/a15.in /home/syu/project/CMPT-300/hw4/Client/test/a15.out

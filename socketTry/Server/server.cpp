@@ -12,27 +12,39 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+#include "../Share/global.h"
 #include "ipaddr.h"
+
+
+char *Ready = "Ready";
+
 
 int count = 0;
 FILE *fp = fopen("config_file.txt", "r");
+
 void *connection_handler(void *socket_desc)
 {
     //Get the socket descriptor
     int sock = *(int*)socket_desc;
     int read_size;
-    char *message , client_message[1024], send_message[1024];
+    char *message , client_message[BUFF_SIZE], send_message[BUFF_SIZE];
     printf("conection comes\n");
 
     sprintf(send_message, "This is message from Server\n");
     //Receive a message from client
-    while( (read_size = recv(sock , client_message , 1024 , 0)) > 0 )
+    while( (read_size = recv(sock , client_message , BUFF_SIZE , 0)) > 0 )
     {
-
+        printf("client says : %s\n", client_message);
+        if (strstr(client_message, Ready) != NULL)
+        {
+            printf("DeliverTask\n");
+        }
+        //diliver task
         size_t len = 0;
         size_t read;
         char *line = NULL;
-        char inputFile[1024], outputFile[1024];
+        char inputFile[BUFF_SIZE], outputFile[BUFF_SIZE];
+
         read = getline(&line, &len, fp);
         if (read == -1)
         {
@@ -43,8 +55,6 @@ void *connection_handler(void *socket_desc)
             break;
         }
         sscanf(line,"%s%s",inputFile,outputFile);
-
-
         sprintf(send_message, "%s\n", line);
         //Send the message back to client
         send(sock , send_message , strlen(send_message), MSG_CONFIRM);
@@ -76,7 +86,7 @@ int main(int argc, char *argv[])
     fscanf(fp, "%d", &port);
     fclose(fp);
 
-    char sendBuff[1025];
+    char sendBuff[BUFF_SIZE];
     time_t ticks;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -114,24 +124,5 @@ int main(int argc, char *argv[])
             return 1;
         }
 
-        // int read_size = 0;
-        // char client_message[1024];
-        // read_size = recv(client_sock, client_message, sizeof(client_message), 0);
-        // if (read_size > 0)
-        // {
-        //     printf("message from client %s\n", client_message);
-        // }
-        // else
-        // {
-        //     printf("no message from client\n" );
-        // }
-        //
-        // printf("One connection comes\n");
-        // ticks = time(NULL);
-        // snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
-        // send(client_sock, sendBuff, strlen(sendBuff), 0);
-        //
-        //
-        // close(client_sock);
      }
 }
