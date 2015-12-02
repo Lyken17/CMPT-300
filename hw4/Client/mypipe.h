@@ -35,6 +35,8 @@ int deliverTask(powerful line, char file[2048]);
 
 int checkEachChild(powerful line);
 
-int checkFreeChild(powerful ppline[], int total);
+int checkEachChild_2(powerful line, char msg[BUFSIZ+1]);
+
+int checkFreeChild(powerful ppline[], int total, char msg[BUFSIZ+1]);
 
 #endif

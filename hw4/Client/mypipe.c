@@ -5,6 +5,8 @@ const char data[] = "Hello pipe!";
 const char owari[] = "__END__OF__TASK__";
 const char finish[] = "__WORK__DONE__";
 const char filled[] = "\0";
+const char success[] = "__SUCCESS__DOEN__";
+
 int data_processed = 0;
 char buffer[BUFSIZ + 1];
 
@@ -45,7 +47,7 @@ int getTask(powerful line, char file[2048])
 int workDone(powerful line)
 {
 	data_processed = write(line.toParent[1], finish, strlen(finish));
-	//printf("Wow, 極楽極楽\n");
+
 	return 0;
 }
 
@@ -87,7 +89,18 @@ int checkEachChild(powerful line)
 	return -1;
 }
 
-int checkFreeChild(powerful ppline[], int total)
+int checkEachChild_2(powerful line, char msg[BUFSIZ+1])
+{
+	int available = checkEachChild(line);
+	if (available == 0)
+	{
+		read(line.toParent[0], buffer, BUFSIZ);
+		sprintf(msg,"%s",buffer);
+	}
+	return available;
+}
+
+int checkFreeChild(powerful ppline[], int total, char msg[BUFSIZ+1])
 {
 	fd_set set;
 	/* Initialize the file descriptor set. */
@@ -103,6 +116,10 @@ int checkFreeChild(powerful ppline[], int total)
   		if (available == 0)
   		{
   			read(ppline[i].toParent[0], buffer, BUFSIZ);
+			if (strlen(buffer) >= 2)
+				sprintf(msg,"%s",buffer);
+			else
+				msg[0] = '\0';
   			//printf("-----------Data is available now.  ");
 	        //printf("The free child is %d-----------\n", i);
   			return i;

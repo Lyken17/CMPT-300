@@ -9,41 +9,27 @@
 #include "awesome.h"
 #include "mypipe.h"
 
-extern const char data[] ;
-extern const char data2[] ;
-extern const char owari[] ;
-extern const char finish[] ;
-extern const char filled[] ;
+extern const char data[];
+extern const char data2[];
+extern const char owari[];
+extern const char finish[];
+extern const char filled[];
 
 int main(int argc, const char * argv[]) {
     char curTime[30];
 
-    if (argc < 2)
-    {
-        puts("Error : Please input config file");
-        exit(-1);
-    }
-    //int taskCount = howManyTasks(argv[1]);
-
     FILE *fp = fopen(argv[1],"r");
     if (fp == NULL) {
         getCurrentTime(curTime);
-        printf("[%s] Cannot find config file.\n", curTime, getpid());
+        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
         exit(-1);
     }
 
     fp = fopen(argv[1],"r");
     size_t len = 0;
-    size_t read;
+    size_t read_line;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
-
-    //Read the scheduling option
-    read = getline(&line, &len, fp);
-    DEBUG_MODE ? printf("%s", line) : 0;
-
-    //
-    int plan = FCFS;
 
     //variables about fork()
     int i = 0;
@@ -52,78 +38,82 @@ int main(int argc, const char * argv[]) {
 
     //Some variables will be used later
     int total = sysconf(_SC_NPROCESSORS_ONLN) - 1;//Cores of computer
-	powerful ppline[total];
+    powerful ppline[total];
 
     int data_processed = 0;
 
-	char buffer[BUFSIZ + 1];
-	memset(buffer, '\0', sizeof(buffer));
+    char buffer[BUFSIZ + 1];
+    memset(buffer, '\0', sizeof(buffer));
 
     char file[2048];
     int pidList[total];
-
     //Create child
     for (i = 0; i < total; ++i) {
-		if (pipe (ppline[i].toChild) || pipe (ppline[i].toParent))
-		{
-			fprintf (stderr, "Pipe failed.\n");
-			return EXIT_FAILURE;
-		}
-		pid = fork();
-		if (pid == 0 || pid == -1) break;
+        if (pipe (ppline[i].toChild) || pipe (ppline[i].toParent))
+        {
+            fprintf (stderr, "Pipe failed.\n");
+            return EXIT_FAILURE;
+        }
+        pid = fork();
+        if (pid == 0 || pid == -1) break;
         pidList[i] = pid;
-	}
+    }
 
     if(pid == -1)
-	{
-		fprintf(stderr, "Fork failure");
-		exit(EXIT_FAILURE);
-	}
+    {
+        fprintf(stderr, "Fork failure");
+        exit(EXIT_FAILURE);
+    }
     else if(pid == 0) //Child process
-	{
-		int job;
+    {
+        int job;
         DEBUG_MODE ? printf("pid = %d, i = %d\n",getpid(), i) : 0;
 
-		workDone(ppline[i]);
-		while(1)
-		{
-			job = getTask(ppline[i], file);
-			if (job == -1)
-			{
+        write(ppline[i].toParent[1], "\n", strlen("\n"));
+        while(1)
+        {
+            job = getTask(ppline[i], file);
+            if (job == -1)
+            {
                 //received finish signal, exit
                 close(ppline[i].toParent[0]);
                 close(ppline[i].toParent[1]);
                 break;
-			}
-			//Task part
-			sscanf(file,"%s%s",inputFile,outputFile);
+            }
+            //Task part
+            sscanf(file,"%s%s",inputFile,outputFile);
             int status = lyrebird(inputFile, outputFile);
             getCurrentTime(curTime);
+            char msg[BUFSIZ + 1];
             if (status == 0)
             {
-                printf("[%s] Process ID #%d decrypted %s successfully.\n", curTime, getpid(), inputFile);
+                //printf("[%s] Process ID #%d decrypted %s successfully.\n", curTime, getpid(), inputFile);
+                sprintf(msg, "[%s] Process ID #%d decrypted %s successfully.\n", curTime, getpid(), inputFile);
             }
             else if (status == -1)
             {
-                printf("[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
+                //printf("[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
+                sprintf(msg, "[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
             }
 
-            DEBUG_MODE ? sleep(rand() % 2 + 1) : 0;
-			workDone(ppline[i]);
-		}
+            1 ? sleep(rand() % 2 + 1) : 0;
+            write(ppline[i].toParent[1], msg, strlen(msg));
+            //printf("%s\n", msg);
+        }
 
-		exit(EXIT_SUCCESS);
-	}
+        exit(EXIT_SUCCESS);
+    }
     else //Parent process
-	{
-        //connect to server
-        
-        //goto FreeAllChild;
-
-		int freeChild = -1;
+    {
+        char msg[BUFSIZ + 1];
+        int freeChild = -1;
         //Read line from file until EOF
-        while ((read = getline(&line, &len, fp)) != -1) {
-            while((freeChild = checkFreeChild(ppline, total)) == -1);
+        while ((read_line = getline(&line, &len, fp)) != -1) {
+
+            while((freeChild = checkFreeChild(ppline, total, msg)) == -1);
+            printf("%s\n", msg);
+            //read(ppline[freeChild].toParent[0], buffer, BUFSIZ);
+
             sscanf(line,"%s%s",inputFile,outputFile);
             //main process
             getCurrentTime(curTime);
@@ -132,25 +122,29 @@ int main(int argc, const char * argv[]) {
             deliverTask(ppline[freeChild], file);
         }
 
-        FreeAllChild:
+        strcpy(file, owari);
+
+        int allChild[total];
+        int n = total;
+        memset(allChild, 0, sizeof(allChild));
         //Whenever a child finish its task, send him a END_OF_TASK signal.
-		strcpy(file, owari);
-		int allChild[total];
-		int n = total;
-		memset(allChild, 0, sizeof(allChild));
-		while (n > 0)
-		{
-			for (int i = 0; i < total; ++i)
-			{
-				if (allChild[i] == 1)
-					continue;
-				int temp;
-				temp = checkEachChild(ppline[i]);
-				if (temp == 0)
-				{
-					allChild[i] = 1;
-					deliverTask(ppline[i], file);
-					n--;
+        while (n > 0)
+        {
+            for (int i = 0; i < total; ++i)
+            {
+                if (allChild[i] == 1)
+                    continue;
+                int temp;
+                temp = checkEachChild(ppline[i]);
+                if (temp == 0)
+                {
+                    read(ppline[i].toParent[0], buffer, BUFSIZ);
+                    sprintf(msg,"%s",buffer);
+                    printf("%s", msg);
+
+                    allChild[i] = 1;
+                    deliverTask(ppline[i], file);
+                    n--;
                     close(ppline[i].toChild[0]);
                     close(ppline[i].toChild[1]);
                     int val;
@@ -167,12 +161,12 @@ int main(int argc, const char * argv[]) {
                         close(ppline[i].toParent[0]);
                         close(ppline[i].toParent[1]);
                     }
-				}
-			}
-		}
+                }
+            }
+        }
 
-		exit(EXIT_SUCCESS);
-	}
+        exit(EXIT_SUCCESS);
+    }
     return 0;
 }
 

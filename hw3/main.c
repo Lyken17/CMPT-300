@@ -22,12 +22,12 @@ int main(int argc, const char * argv[]) {
 
     fp = fopen(argv[1],"r");
     size_t len = 0;
-    size_t read;
+    size_t read_line;
     char *line = NULL;
     char inputFile[1024], outputFile[1024];
 
     //Read the scheduling option
-    read = getline(&line, &len, fp);
+    read_line = getline(&line, &len, fp);
     DEBUG_MODE ? printf("%s", line) : 0;
 
     //
@@ -40,55 +40,55 @@ int main(int argc, const char * argv[]) {
 
     //Some variables will be used later
     int total = sysconf(_SC_NPROCESSORS_ONLN) - 1;//Cores of computer
-	powerful ppline[total];
+    powerful ppline[total];
 
     int data_processed = 0;
-	const char data[] = "Hello pipe!";
-	const char data2[] = "Hello doubi!";
-	const char owari[] = "__END__OF__TASK__";
-	const char finish[] = "__WORK__DONE__";
-	const char filled[] = "\0";
-	char buffer[BUFSIZ + 1];
-	memset(buffer, '\0', sizeof(buffer));
+    const char data[] = "Hello pipe!";
+    const char data2[] = "Hello doubi!";
+    const char owari[] = "__END__OF__TASK__";
+    const char finish[] = "__WORK__DONE__";
+    const char filled[] = "\0";
+    char buffer[BUFSIZ + 1];
+    memset(buffer, '\0', sizeof(buffer));
 
     char file[2048];
     int pidList[total];
     //Create child
     for (i = 0; i < total; ++i) {
-		if (pipe (ppline[i].toChild) || pipe (ppline[i].toParent))
-		{
-			fprintf (stderr, "Pipe failed.\n");
-			return EXIT_FAILURE;
-		}
-		pid = fork();
-		if (pid == 0 || pid == -1) break;
+        if (pipe (ppline[i].toChild) || pipe (ppline[i].toParent))
+        {
+            fprintf (stderr, "Pipe failed.\n");
+            return EXIT_FAILURE;
+        }
+        pid = fork();
+        if (pid == 0 || pid == -1) break;
         pidList[i] = pid;
-	}
+    }
 
     if(pid == -1)
-	{
-		fprintf(stderr, "Fork failure");
-		exit(EXIT_FAILURE);
-	}
+    {
+        fprintf(stderr, "Fork failure");
+        exit(EXIT_FAILURE);
+    }
     else if(pid == 0) //Child process
-	{
+    {
 
-		int job;
+        int job;
         DEBUG_MODE ? printf("pid = %d, i = %d\n",getpid(), i) : 0;
 
-		workDone(ppline[i]);
-		while(1)
-		{
-			job = getTask(ppline[i], file);
-			if (job == -1)
-			{
+        workDone(ppline[i]);
+        while(1)
+        {
+            job = getTask(ppline[i], file);
+            if (job == -1)
+            {
                 //received finish signal, exit
                 close(ppline[i].toParent[0]);
                 close(ppline[i].toParent[1]);
                 break;
-			}
-			//Task part
-			sscanf(file,"%s%s",inputFile,outputFile);
+            }
+            //Task part
+            sscanf(file,"%s%s",inputFile,outputFile);
             int status = lyrebird(inputFile, outputFile);
             getCurrentTime(curTime);
             if (status == 0)
@@ -101,19 +101,20 @@ int main(int argc, const char * argv[]) {
             }
 
             DEBUG_MODE ? sleep(rand() % 2 + 1) : 0;
-			workDone(ppline[i]);
-		}
+            workDone(ppline[i]);
+        }
 
-		exit(EXIT_SUCCESS);
-	}
+        exit(EXIT_SUCCESS);
+    }
     else //Parent process
-	{
+    {
         if (plan == FCFS) //FCFS scheduling
         {
-    		int freeChild = -1;
+            int freeChild = -1;
             //Read line from file until EOF
-            while ((read = getline(&line, &len, fp)) != -1) {
+            while ((read_line = getline(&line, &len, fp)) != -1) {
                 while((freeChild = checkFreeChild(ppline, total)) == -1);
+                //read(ppline[freeChild].toParent[0], buffer, BUFSIZ);
 
                 sscanf(line,"%s%s",inputFile,outputFile);
                 //main process
@@ -123,29 +124,29 @@ int main(int argc, const char * argv[]) {
                 deliverTask(ppline[freeChild], file);
             }
 
-    		strcpy(file, owari);
+            strcpy(file, owari);
 
-    		int allChild[total];
-    		int n = total;
-    		memset(allChild, 0, sizeof(allChild));
+            int allChild[total];
+            int n = total;
+            memset(allChild, 0, sizeof(allChild));
             //Whenever a child finish its task, send him a END_OF_TASK signal.
-    		while (n > 0)
-    		{
-    			for (int i = 0; i < total; ++i)
-    			{
-    				if (allChild[i] == 1)
-    					continue;
-    				int temp;
-    				temp = checkEachChild(ppline[i]);
-    				if (temp == 0)
-    				{
-    					allChild[i] = 1;
-    					deliverTask(ppline[i], file);
-    					n--;
+            while (n > 0)
+            {
+                for (int i = 0; i < total; ++i)
+                {
+                    if (allChild[i] == 1)
+                        continue;
+                    int temp;
+                    temp = checkEachChild(ppline[i]);
+                    if (temp == 0)
+                    {
+                        allChild[i] = 1;
+                        deliverTask(ppline[i], file);
+                        n--;
                         close(ppline[i].toChild[0]);
                         close(ppline[i].toChild[1]);
                         int val;
-	                    waitpid(pidList[i], &val,WUNTRACED);
+                        waitpid(pidList[i], &val,WUNTRACED);
                         if (val == 0)
                         {
                             //normal exit
@@ -158,9 +159,9 @@ int main(int argc, const char * argv[]) {
                             close(ppline[i].toParent[0]);
                             close(ppline[i].toParent[1]);
                         }
-    				}
-    			}
-    		}
+                    }
+                }
+            }
         }
         else if (plan == ROUND_ROBIN) //FCFS scheduling
         {
@@ -169,11 +170,11 @@ int main(int argc, const char * argv[]) {
             ffname taskList[total][arrayLength];
             memset(taskList, 0, sizeof(taskList));
 
-    		int freeChild = -1;
+            int freeChild = -1;
             //Read line from file until EOF
             int k = 0;
             //Make a task table
-            while ((read = getline(&line, &len, fp)) != -1)
+            while ((read_line = getline(&line, &len, fp)) != -1)
             {
                 strcpy(taskList[k % total][k / total].name, line);
                 k++;
@@ -192,24 +193,24 @@ int main(int argc, const char * argv[]) {
                 j = currTask[freeChild];
                 if (strcmp(taskList[i][j].name, empty) == 0)
                 {
-                     // all tasks are done
-                     strcpy(file, owari);
-                     deliverTask(ppline[i], file);
-                     close(ppline[i].toChild[0]);
-                     close(ppline[i].toChild[1]);
+                    // all tasks are done
+                    strcpy(file, owari);
+                    deliverTask(ppline[i], file);
+                    close(ppline[i].toChild[0]);
+                    close(ppline[i].toChild[1]);
 
-                     int val;
-                     waitpid(pidList[i], &val,WUNTRACED);
-                     if (val == 0)
-                     {
+                    int val;
+                    waitpid(pidList[i], &val,WUNTRACED);
+                    if (val == 0)
+                    {
                         DEBUG_MODE ?  printf("PID:%d goes home and is playing dota!\n", pidList[i]) : 0;
-                     }
-                     else
-                     {
-                         printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, pidList[i]);
-                         close(ppline[i].toParent[0]);
-                         close(ppline[i].toParent[1]);
-                     }
+                    }
+                    else
+                    {
+                        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, pidList[i]);
+                        close(ppline[i].toParent[0]);
+                        close(ppline[i].toParent[1]);
+                    }
                 }
                 else
                 {
@@ -231,8 +232,8 @@ int main(int argc, const char * argv[]) {
 
         }
 
-		exit(EXIT_SUCCESS);
-	}
+        exit(EXIT_SUCCESS);
+    }
     return 0;
 }
 
