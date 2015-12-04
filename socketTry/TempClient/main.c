@@ -5,7 +5,19 @@
 //  Created by Lyken Syu on 9/11/15.
 //  Copyright (c) 2015 Lyken Syu. All rights reserved.
 
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <arpa/inet.h>
+#include <time.h>
 
+#include "../Share/global.h"
 #include "awesome.h"
 #include "mypipe.h"
 
@@ -14,6 +26,8 @@ extern const char data2[];
 extern const char owari[];
 extern const char finish[];
 extern const char filled[];
+
+char *Ready = "Ready";
 
 int main(int argc, const char * argv[]) {
     char curTime[30];
@@ -38,7 +52,6 @@ int main(int argc, const char * argv[]) {
 
     //Some variables will be used later
     int total = sysconf(_SC_NPROCESSORS_ONLN) - 1;//Cores of computer
-    //total = 8;
 
     powerful ppline[total];
 
@@ -51,6 +64,10 @@ int main(int argc, const char * argv[]) {
     int pidList[total];
     //Create child
     for (i = 0; i < total; ++i) {
+
+        // pid = 1;
+        // break;
+
         if (pipe (ppline[i].toChild) || pipe (ppline[i].toParent))
         {
             fprintf (stderr, "Pipe failed.\n");
@@ -106,27 +123,126 @@ int main(int argc, const char * argv[]) {
     }
     else //Parent process
     {
+        //new added socket part
+        int sockfd = 0;
+        char recvBuff[BUFF_SIZE];
+        struct sockaddr_in serv_addr;
+        int flag = 1;
+        // if(argc <= 1)
+        // {
+        //     printf("Please input server ip address\n");
+        //     return -1;
+        // }
+        // else if (argc <= 2)
+        // {
+        //     printf("Please input server port\n" );
+        //     return -1;
+        // }
+
+        char serv_ip[30];
+        //strcpy(serv_ip, argv[1]);
+        strcpy(serv_ip, "207.23.172.193");
+
+        if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+        {
+            printf("\n Error : Could not create socket \n");
+            for( i = 0; i < total; i++)
+            {
+                kill(pidList[i], SIGTERM);
+            }
+            return -1;
+        }
+
+        memset(&serv_addr, '0', sizeof(serv_addr));
+
+        //int port = atoi(argv[2]);
+        int port = atoi("2333");
+        printf("Servere IP : %s Port : %d\n",serv_ip, port);
+        // FILE *fp = fopen("../Share/config.txt","r");
+        // fscanf(fp, "%d", &port);
+        // fclose(fp);
+
+        serv_addr.sin_family = AF_INET;
+        serv_addr.sin_port = htons(port);
+
+        if(inet_pton(AF_INET, serv_ip, &serv_addr.sin_addr)<=0)
+        {
+            printf("\n inet_pton error occured\n");
+            for( i = 0; i < total; i++)
+            {
+                kill(pidList[i], SIGTERM);
+            }
+            return -1;
+        }
+
+        if(connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0)
+        {
+           printf("\n Error : Connect Failed \n");
+           for( i = 0; i < total; i++)
+           {
+               kill(pidList[i], SIGTERM);
+           }
+           return -1;
+        }
+        char sendMessage[BUFF_SIZE];
+        send(sockfd, "\n", strlen("\n"), MSG_CONFIRM);
+
+        //pipeline and job handle
         char msg[BUFSIZ + 1];
         int freeChild = -1;
-        //Read line from file until EOF
-        while ((read_line = getline(&line, &len, fp)) != -1) {
+
+        while(1){
+            memset(recvBuff, 0, sizeof(recvBuff));
+            recv(sockfd, recvBuff, sizeof(recvBuff), 0);
+
+            if (strcmp(recvBuff, "GO_HOME_HAVE_FUN") == 0)
+            {
+                //puts("LALALA DOTA gogogo");
+                break;
+            }
+
+            char inputFile[BUFF_SIZE], outputFile[BUFF_SIZE];
+            sscanf(recvBuff, "%s%s",inputFile, outputFile);
+            //printf("To handle %s, taget is %s\n", inputFile, outputFile);
+
+
             while((freeChild = checkFreeChild(ppline, total, msg)) == -1);
+            //printf("%s", msg);
+            char tmp[BUFF_SIZE+1];
+            //main process
+            getCurrentTime(curTime);
+            sprintf(tmp,"[%s] Child process ID #%d will decrypt %s.\n", curTime, pidList[freeChild], inputFile);
+            strcpy(file, recvBuff);
+            deliverTask(ppline[freeChild], file);
+
+            time_t t;
+            srand((unsigned) time(&t));
+            //sprintf(sendMessage, "%s + %d", "Receive", rand() % 50 );
+            sprintf(sendMessage,"%s%s",tmp,msg);
+            send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+        }
+
+        //Read line from file until EOF
+        /*
+        while ((read_line = getline(&line, &len, fp)) != -1) {
+            //while((freeChild = checkFreeChild(ppline, total, msg)) == -1);
             printf("%s", msg);
             //read(ppline[freeChild].toParent[0], buffer, BUFSIZ);
-
             sscanf(line,"%s%s",inputFile,outputFile);
             //main process
             getCurrentTime(curTime);
             printf("[%s] Child process ID #%d will decrypt %s.\n", curTime, pidList[freeChild], inputFile);
             strcpy(file, line);
-            deliverTask(ppline[freeChild], file);
+            //deliverTask(ppline[freeChild], file);
         }
+        */
 
         strcpy(file, owari);
 
         int allChild[total];
         int n = total;
         memset(allChild, 0, sizeof(allChild));
+
         //Whenever a child finish its task, send him a END_OF_TASK signal.
         while (n > 0)
         {
@@ -141,9 +257,15 @@ int main(int argc, const char * argv[]) {
                     memset(buffer, 0, sizeof(buffer));
                     read(ppline[i].toParent[0], buffer, BUFSIZ);
                     //printf("%s", buffer);
-                    sprintf(msg,"%s",buffer);
-                    printf("%s", msg);
+                    if (strlen(buffer) >= 3) {
+                        sprintf(msg,"%s",buffer);
+                        //printf("%s", msg);
 
+                        char tmp[BUFF_SIZE+1];
+                        sprintf(sendMessage,"%s",msg);
+                        recv(sockfd, recvBuff, sizeof(recvBuff), 1);
+                        send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+                    }
                     allChild[i] = 1;
                     deliverTask(ppline[i], file);
                     n--;
@@ -166,7 +288,9 @@ int main(int argc, const char * argv[]) {
                 }
             }
         }
-
+        sprintf(sendMessage,"%s","FINISH_DONE");
+        send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+        close(sockfd);
         exit(EXIT_SUCCESS);
     }
     return 0;

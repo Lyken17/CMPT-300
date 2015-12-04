@@ -17,15 +17,23 @@ char *Ready = "Ready";
 
 int main(int argc, char *argv[])
 {
-    int sockfd = 0, n = 0;
+    int sockfd = 0;
     char recvBuff[BUFF_SIZE];
     struct sockaddr_in serv_addr;
 
-    if(argc != 2)
+    if(argc <= 1)
     {
-        printf("\n Usage: %s <ip of server> \n",argv[0]);
-        return 1;
+        printf("Please input server ip address\n");
+        return -1;
     }
+    else if (argc <= 2)
+    {
+        printf("Please input server port\n" );
+        return -1;
+    }
+
+    char serv_ip[30];
+    strcpy(serv_ip, argv[1]);
 
     if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
@@ -35,15 +43,16 @@ int main(int argc, char *argv[])
 
     memset(&serv_addr, '0', sizeof(serv_addr));
 
-    int port = 1234;
-    FILE *fp = fopen("../Share/config.txt","r");
-    fscanf(fp, "%d", &port);
-    fclose(fp);
+    int port = atoi(argv[2]);
+    printf("Servere IP : %s Port : %d\n",serv_ip, port);
+    // FILE *fp = fopen("../Share/config.txt","r");
+    // fscanf(fp, "%d", &port);
+    // fclose(fp);
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port);
 
-    if(inet_pton(AF_INET, argv[1], &serv_addr.sin_addr)<=0)
+    if(inet_pton(AF_INET, serv_ip, &serv_addr.sin_addr)<=0)
     {
         printf("\n inet_pton error occured\n");
         return 1;
@@ -58,17 +67,12 @@ int main(int argc, char *argv[])
 
     char *hello = "Call from Lyken";
     char sendMessage[BUFF_SIZE];
-    sprintf(sendMessage, "%s", Ready );
-    send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+    //sprintf(sendMessage, "%s", Ready );
+    send(sockfd, Ready, strlen(Ready), MSG_CONFIRM);
 
     while(1){
         memset(recvBuff, 0, sizeof(recvBuff));
         recv(sockfd, recvBuff, sizeof(recvBuff), 0);
-
-        time_t t;
-        srand((unsigned) time(&t));
-        sprintf(sendMessage, "%s + %d", hello, rand() % 50 );
-        send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
 
         if (strcmp(recvBuff, "GO_HOME_HAVE_FUN") == 0)
         {
@@ -79,6 +83,11 @@ int main(int argc, char *argv[])
         char inputFile[BUFF_SIZE], outputFile[BUFF_SIZE];
         sscanf(recvBuff, "%s%s",inputFile, outputFile);
         printf("To handle %s, taget is %s\n", inputFile, outputFile);
+
+        time_t t;
+        srand((unsigned) time(&t));
+        sprintf(sendMessage, "%s + %d", hello, rand() % 50 );
+        send(sockfd, Ready, strlen(Ready), MSG_CONFIRM);
 
         sleep(1);
     }
