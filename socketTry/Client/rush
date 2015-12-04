@@ -1,3 +1,4 @@
-make
+make clean
+make -j 8
 clear
-./a.out 207.23.172.193 2333
+./lyrebird.client 207.23.172.193 2333

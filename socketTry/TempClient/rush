@@ -1,4 +1,0 @@
-make clean
-make -j 8
-clear
-./lyrebird.client 207.23.172.193 2333

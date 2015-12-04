@@ -11,15 +11,20 @@
 #include <pthread.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "../Share/global.h"
 #include "ipaddr.h"
 #include "memwatch.h"
 
-struct threadInfo {
+struct threadInfo_t {
     int socket_desc;
     char ip[30];
 };
+
+typedef struct threadInfo_t threadInfo;
+
 int clientCount = 0;
 char *Ready = "Ready";
 int count = 0;
@@ -148,7 +153,7 @@ int main(int argc, char *argv[])
     memset(&serv_addr, '0', sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    serv_addr.sin_port = htons(port);
+    serv_addr.sin_port = 0;
 
     if (bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
         printf("Bind error\n" );
@@ -165,7 +170,7 @@ int main(int argc, char *argv[])
     char ip[30];
     ipaddr(ip);
     ticks = time(NULL);
-    fprintf(fout, "[%.24s] lyrebird.server: PID %d on host %s, port %d\n", ctime(&ticks), getpid(), ip, ntohs(serv_addr.sin_port));
+    printf("[%.24s] lyrebird.server: PID %d on host %s, port %d\n", ctime(&ticks), getpid(), ip, ntohs(serv_addr.sin_port));
 
     while(1)
     {

@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO -std=c11 -pthread
 LIBS = -lm
 TARGET = lyrebird.server
-OBJECTS = server.o ipaddr.o
+OBJECTS = server.o ipaddr.o memwatch.o
 
 all: $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(TARGET) $^ $(LIBS)
