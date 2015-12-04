@@ -14,20 +14,22 @@
 
 #include "../Share/global.h"
 #include "ipaddr.h"
+#include "memwatch.h"
 
 struct threadInfo {
     int socket_desc;
     char ip[30];
 };
-
+int clientCount = 0;
 char *Ready = "Ready";
 int count = 0;
-FILE *fp;
+FILE *fp, *fout;
 int hasReachEnd = 0;
 
 
 void *connection_handler(void *information)
 {
+    clientCount++;
     threadInfo clientInfo = *(threadInfo *) information;
     //Get the socket descriptor
     //int sock = *(int*)socket_desc;
@@ -37,17 +39,18 @@ void *connection_handler(void *information)
     time_t ticks;
     ticks = time(NULL);
 
-    printf("[%.24s] Successfully connected to lyrebird client %s\n", ctime(&ticks), clientInfo.ip);
+    fprintf(fout,"[%.24s] Successfully connected to lyrebird client %s\n", ctime(&ticks), clientInfo.ip);
 
     //Receive a message from client
     while( (read_size = recv(sock , client_message , BUFF_SIZE , 0)) > 0 )
     {
-        if (strlen(client_message) >= 3)
-            printf("%s", client_message);
+        if (strlen(client_message) >= 5) {
+            ticks = time(NULL);
+            fprintf(fout,"[%.24s] The lyrebird client %s%s",ctime(&ticks), clientInfo.ip ,client_message);
+        }
         memset(client_message, 0, sizeof(client_message));
         //if (strstr(client_message, Ready) != NULL)
-        if (1)
-        {
+
             //diliver task
             size_t len = 0;
             size_t read;
@@ -64,22 +67,30 @@ void *connection_handler(void *information)
                 break;
             }
             sscanf(line,"%s%s",inputFile,outputFile);
+            ticks = time(NULL);
+            fprintf(fout,"[%.24s] The lyrebird client %s has been given the task of decrypting %s\n",ctime(&ticks), clientInfo.ip ,inputFile);
 
-            //printf("Deliver %s\n", inputFile);
             sprintf(send_message, "%s\n", line);
             //Send the message back to client
             send(sock , send_message , strlen(send_message), MSG_CONFIRM);
-        }
+
     }
     while( (read_size = recv(sock , client_message , BUFF_SIZE , 0)) > 0 )
     {
         if (strstr(client_message, "FINISH_DONE"))
         {
             ticks = time(NULL);
-            printf("[%.24s] lyrebird client %s has disconnected expectedly\n", ctime(&ticks), clientInfo.ip);
-            break;
+            fprintf(fout,"[%.24s] lyrebird client %s has disconnected expectedly\n", ctime(&ticks), clientInfo.ip);
+            clientCount--;
+            free(information);
+            if (clientCount == 0) {
+                fclose(fp);
+                exit(-1);
+            }
+
         }
-        printf("%s", client_message);
+        ticks = time(NULL);
+        fprintf(fout,"[%.24s] The lyrebird client %s %s",ctime(&ticks), clientInfo.ip ,client_message);
         memset(client_message, 0, sizeof(client_message));
     }
 
@@ -92,9 +103,7 @@ void *connection_handler(void *information)
     {
         perror("recv failed");
     }
-
-    //Free the socket pointer
-    //free(socket_desc);
+    clientCount--;
     free(information);
 
     return 0;
@@ -109,10 +118,22 @@ int main(int argc, char *argv[])
 
     int port = 2333;
 
-    fp = fopen("config_file.txt", "r");
+    if (argc <= 1) {
+        printf("Please input config file\n");
+        return -1;
+    }
+    else if (argc <= 2) {
+        printf("Please input log file\n" );
+        return -1;
+    }
+
+    fp = fopen(argv[1], "r");
     if (fp == NULL) {
         printf("Config file doesn't exsit\n");
     }
+
+    fout = fopen(argv[2], "w+");
+
 
     char sendBuff[BUFF_SIZE];
     time_t ticks;
@@ -144,13 +165,14 @@ int main(int argc, char *argv[])
     char ip[30];
     ipaddr(ip);
     ticks = time(NULL);
-    printf("[%.24s] lyrebird.server: PID %d on host %s, port %d\n", ctime(&ticks), getpid(), ip, ntohs(serv_addr.sin_port));
+    fprintf(fout, "[%.24s] lyrebird.server: PID %d on host %s, port %d\n", ctime(&ticks), getpid(), ip, ntohs(serv_addr.sin_port));
 
     while(1)
     {
         struct sockaddr_in their_addr;
         socklen_t addr_size;
         client_sock = accept(listenfd, (struct sockaddr*)&their_addr, &addr_size);
+
         //get client ip address
 
         char *addr = inet_ntoa(their_addr.sin_addr);
@@ -174,6 +196,5 @@ int main(int argc, char *argv[])
             perror("could not create thread");
             return 1;
         }
-
      }
 }

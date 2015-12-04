@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO -std=c11 -pthread
 LIBS = -lm
-TARGET = tar
+TARGET = lyrebird.server
 OBJECTS = server.o ipaddr.o
 
 all: $(OBJECTS)

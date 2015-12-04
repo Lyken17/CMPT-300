@@ -32,14 +32,17 @@ char *Ready = "Ready";
 int main(int argc, const char * argv[]) {
     char curTime[30];
 
-    FILE *fp = fopen(argv[1],"r");
-    if (fp == NULL) {
-        getCurrentTime(curTime);
-        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, getpid());
-        exit(-1);
+    if(argc <= 1)
+    {
+        printf("Please input server ip address\n");
+        return -1;
+    }
+    else if (argc <= 2)
+    {
+        printf("Please input server port\n" );
+        return -1;
     }
 
-    fp = fopen(argv[1],"r");
     size_t len = 0;
     size_t read_line;
     char *line = NULL;
@@ -107,14 +110,14 @@ int main(int argc, const char * argv[]) {
             if (status == 0)
             {
                 //printf("[%s] Process ID #%d decrypted %s successfully.\n", curTime, getpid(), inputFile);
-                sprintf(msg, "[%s] Process ID #%d decrypted %s successfully.\n", curTime, getpid(), inputFile);
+                sprintf(msg, "has successfully decrypted %s in process %d.\n", inputFile, getpid());
             }
             else if (status == -1)
             {
                 //printf("[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
-                sprintf(msg, "[%s] Process ID #%d cannot find %s.\n", curTime, getpid(), inputFile);
+                sprintf(msg, "has encountered an error: Unable to open file %s in process %d.\n", inputFile, getpid());
             }
-            1 ? sleep(rand() % 2 + 1) : 0;
+            DEBUG_MODE ? sleep(rand() % 2 + 1) : 0;
             write(ppline[i].toParent[1], msg, strlen(msg));
             //printf("%s\n", msg);
         }
@@ -128,20 +131,11 @@ int main(int argc, const char * argv[]) {
         char recvBuff[BUFF_SIZE];
         struct sockaddr_in serv_addr;
         int flag = 1;
-        // if(argc <= 1)
-        // {
-        //     printf("Please input server ip address\n");
-        //     return -1;
-        // }
-        // else if (argc <= 2)
-        // {
-        //     printf("Please input server port\n" );
-        //     return -1;
-        // }
+
 
         char serv_ip[30];
-        //strcpy(serv_ip, argv[1]);
-        strcpy(serv_ip, "207.23.172.193");
+        strcpy(serv_ip, argv[1]);
+        //strcpy(serv_ip, "207.23.172.193");
 
         if((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
         {
@@ -155,12 +149,9 @@ int main(int argc, const char * argv[]) {
 
         memset(&serv_addr, '0', sizeof(serv_addr));
 
-        //int port = atoi(argv[2]);
-        int port = atoi("2333");
-        printf("Servere IP : %s Port : %d\n",serv_ip, port);
-        // FILE *fp = fopen("../Share/config.txt","r");
-        // fscanf(fp, "%d", &port);
-        // fclose(fp);
+        int port = atoi(argv[2]);
+        //int port = atoi("2333");
+
 
         serv_addr.sin_family = AF_INET;
         serv_addr.sin_port = htons(port);
@@ -184,6 +175,11 @@ int main(int argc, const char * argv[]) {
            }
            return -1;
         }
+
+        time_t ticks;
+        ticks = time(NULL);
+        printf("[%.24s] lyrebird client: PID %d connected to server %s on port %d.\n", ctime(&ticks), getpid(),serv_ip, port);
+
         char sendMessage[BUFF_SIZE];
         send(sockfd, "\n", strlen("\n"), MSG_CONFIRM);
 
@@ -205,7 +201,6 @@ int main(int argc, const char * argv[]) {
             sscanf(recvBuff, "%s%s",inputFile, outputFile);
             //printf("To handle %s, taget is %s\n", inputFile, outputFile);
 
-
             while((freeChild = checkFreeChild(ppline, total, msg)) == -1);
             //printf("%s", msg);
             char tmp[BUFF_SIZE+1];
@@ -218,7 +213,8 @@ int main(int argc, const char * argv[]) {
             time_t t;
             srand((unsigned) time(&t));
             //sprintf(sendMessage, "%s + %d", "Receive", rand() % 50 );
-            sprintf(sendMessage,"%s%s",tmp,msg);
+            memset(sendMessage, 0, sizeof(sendMessage));
+            sprintf(sendMessage," %s",msg);
             send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
         }
 
@@ -281,7 +277,7 @@ int main(int argc, const char * argv[]) {
                     else
                     {
                         //abnormal exit
-                        sprintf(msg, "[%s] Process ID #%d did not terminate successfully.\n", curTime, pidList[i]);
+                        printf("[%s] Process ID #%d did not terminate successfully.\n", curTime, pidList[i]);
                         close(ppline[i].toParent[0]);
                         close(ppline[i].toParent[1]);
                     }
@@ -290,6 +286,7 @@ int main(int argc, const char * argv[]) {
         }
         sprintf(sendMessage,"%s","FINISH_DONE");
         send(sockfd, sendMessage, strlen(sendMessage), MSG_CONFIRM);
+        printf("[%.24s] lyrebird client: PID %d completed its tasks and is exiting successfully.\n", ctime(&ticks), getpid());
         close(sockfd);
         exit(EXIT_SUCCESS);
     }

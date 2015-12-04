@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS  = -DMEMWATCH -DMEMWATCH_STDIO -std=c11
 LIBS = -lm
-TARGET = lyrebird
+TARGET = lyrebird.client
 OBJECTS = main.o awesome.o mypipe.o memwatch.o
 
 all: $(OBJECTS)
@@ -17,4 +17,3 @@ clean:
 	-rm -f *.o
 	-rm -f *.log
 	-rm -f *.out
-	-rm -f ./test/*.out

@@ -1,0 +1,32 @@
+[Thu Dec  3 18:49:04 2015] lyrebird.server: PID 12906 on host 207.23.172.193, port 2333
+[Thu Dec  3 18:49:05 2015] Successfully connected to lyrebird client 0.0.0.0
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a1.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a12.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a1.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a2.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a12.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a13.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a2.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a3.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a13.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a4.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a3.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a15.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a4.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a6.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a15.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a7.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a6.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a8.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a7.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a9.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a10.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a8.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a11.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a10.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a5.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a11.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has been given the task of decrypting ./test/a14.in
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has successfully decrypted ./test/a5.in in process 12934.
+[Thu Dec  3 18:49:05 2015] The lyrebird client 0.0.0.0 has encountered an error: Unable to open file ./test/a14.in in process 12934.
+[Thu Dec  3 18:49:05 2015] lyrebird client 0.0.0.0 has disconnected expectedly
