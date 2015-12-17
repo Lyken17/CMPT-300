@@ -1,0 +1,50 @@
+<!DOCTYPE html><html><head><title>HW4 REPORT</title><meta charset='utf-8'><link href='https://d31qtcb7c58z3n.cloudfront.net/res-min/themes/marxico.css' rel='stylesheet'></head><body><div id='preview-contents' class='note-content'>
+                        <div id="wmd-preview" class="preview-content"></div>
+                    <div id="wmd-preview-section-17" class="wmd-preview-section preview-content"></div><div id="wmd-preview-section-27" class="wmd-preview-section preview-content">
+
+<h1 id="hw4-report">HW4 REPORT</h1></div><div id="wmd-preview-section-252" class="wmd-preview-section preview-content">
+
+<h2 id="overview">Overview</h2>
+
+<p>The main skeleton doesn’t change a lot from hw3. The only one thing different is that instead of read tasks from file, the parent process gets tasks from socket. And, the log information is passed through socket as well.</p></div><div id="wmd-preview-section-306" class="wmd-preview-section preview-content">
+
+<h2 id="implementation">Implementation</h2>
+
+</div><div id="wmd-preview-section-944" class="wmd-preview-section preview-content">
+
+<h3 id="server">Server</h3>
+
+<p>Creat Socket and listen to port</p></div><div id="wmd-preview-section-1432" class="wmd-preview-section preview-content">
+
+<pre class="prettyprint hljs-dark"><code class="language-c++ hljs cpp">main {<br>    <span class="hljs-keyword">int</span> listenfd = <span class="hljs-number">0</span>, client_sock = <span class="hljs-number">0</span>;<br>    <span class="hljs-keyword">struct</span> sockaddr_in serv_addr;<br><br>    listenfd = socket(AF_INET, SOCK_STREAM, <span class="hljs-number">0</span>);<br><br>    serv_addr.sin_family = AF_INET;<br>    serv_addr.sin_addr.s_addr = INADDR_ANY;<br>    serv_addr.sin_port = <span class="hljs-number">0</span>; <span class="hljs-comment">//random choose a avaliable port</span><br><br>    bind(listenfd, (<span class="hljs-keyword">struct</span> sockaddr*)&amp;serv_addr, <span class="hljs-keyword">sizeof</span>(serv_addr);<br>    listen(listenfd, <span class="hljs-number">10</span>);<br><br>    <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>) {<br>        <span class="hljs-keyword">struct</span> sockaddr_in their_addr;<br>        socklen_t addr_size;<br>        <span class="hljs-comment">//block waiting until there is a request</span><br>        client_sock = accept(listenfd, (<span class="hljs-keyword">struct</span> sockaddr*)&amp;their_addr, &amp;addr_size);<br>        <span class="hljs-comment">//Create a thread for each client</span><br>        pthread_create( &amp;sniffer_thread , NULL ,  connection_handler , (<span class="hljs-keyword">void</span>*) clientInfo);<br>    }<br>}<br></code></pre>
+
+<p>Handle request</p>
+
+</div><div id="wmd-preview-section-1891" class="wmd-preview-section preview-content">
+
+<pre class="prettyprint hljs-dark"><code class="language-c++ hljs cpp">Connection_handle {<br>    read task from file and send it to client.<br>    <span class="hljs-comment">//Since I use thread, so file point is shared between threads and there will not be a read-write confliction.</span><br>    receive response from client and print into log_file.<br>}<br></code></pre></div><div id="wmd-preview-section-1572" class="wmd-preview-section preview-content">
+
+<h3 id="client">Client</h3>
+
+</div><div id="wmd-preview-section-2453" class="wmd-preview-section preview-content">
+
+<pre class="prettyprint hljs-dark"><code class="language-c++ hljs cpp">child_process {<br>    Do as before, but instead of print out directly send the run status to parent through pipeline.<br>}<br><br>parent_process {<br>    wait until there is a <span class="hljs-built_in">free</span> child <span class="hljs-comment">//FCFS</span><br>    send response to Server<br>    read task from socket<br>    deliver it to avaliable child.<br>}<br></code></pre></div><div id="wmd-preview-section-3754" class="wmd-preview-section preview-content">
+
+<h2 id="test">Test</h2>
+
+<ol><li rel="1"><p>Multi client connection <br>
+Set sleep(1) for each client. Start the server, use several clients to connect. Check whether task are delivered alternate. <br>
+Passed</p></li>
+<li rel="2"><p>Check normal cases <br>
+Run sample test, and check whether logs are printed as expected. <br>
+Passed</p></li>
+<li rel="3"><p>Abnormal situation</p>
+
+<ul>
+<li>File doesn’t exit <br>
+[Unable to find <em>*</em>] print out succesfully</li>
+<li>Client exit not as expected <br>
+Log print</li></ul></li>
+<li rel="4"><p>Large file test <br>
+Passed</p></li>
+</ol></div><div id="wmd-preview-section-footnotes" class="preview-content"></div></div></body></html>

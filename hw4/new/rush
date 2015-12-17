@@ -1,0 +1,3 @@
+make
+clear
+./lyrebird.server config_file.txt log_file.txt
