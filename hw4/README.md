@@ -1,6 +1,3 @@
-Name : Ligeng Zhu
-Student number : 301295766
-SFU user name : lykenz
 Lecture section : D1
 TA's name : Scott Kristjanson
 
